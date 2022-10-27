@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: currency-exchange
+  config:
+    import: optional:configserver:http://localhost:8888
+  profiles:
+    active: qa
+  jpa:
+    show-sql: true
+    defer-datasource-initialization: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+  h2:
+    console:
+      enabled: true
+
+eureka:
+  client:
+    eureka-server-port: 8761
+
+server:
+  port: 8000
+
+resilience4j:
+  retry:
+    instances:
+      sample-api:
+        maxRetryAttempts: 5
+        waitDuration: 1s
+        enableExponentialBackoff: true
+  ratelimiter:
+    instances:
+      default:
+        limitForPeriod: 2
+        limitRefreshPeriod: 10s
+  bulkhead:
+    instances:
+      default:
+        maxConcurrentCalls: 10
