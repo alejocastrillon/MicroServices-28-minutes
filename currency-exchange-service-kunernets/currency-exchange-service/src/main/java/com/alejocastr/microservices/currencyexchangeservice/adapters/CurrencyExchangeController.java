@@ -1,0 +1,36 @@
+package com.alejocastr.microservices.currencyexchangeservice.adapters;
+
+import com.alejocastr.microservices.currencyexchangeservice.domain.CurrencyExchange;
+import com.alejocastr.microservices.currencyexchangeservice.ports.CurrencyExchangeService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("currency-exchange")
+@AllArgsConstructor
+@Slf4j
+public class CurrencyExchangeController {
+
+    private final Environment environment;
+
+    private final CurrencyExchangeService service;
+
+    @GetMapping("/from/{from}/to/{to}")
+    public ResponseEntity<CurrencyExchange> retriveExchangeValue(@PathVariable String from,
+                                                                 @PathVariable String to) {
+        log.info("retriveExchangeValue called with {} to {}", from, to);
+        CurrencyExchange currencyExchange = service.retrieveCurrencyExchange(from, to);
+        String port = environment.getProperty("local.server.port");
+        String host = environment.getProperty("HOSTNAME");
+        String version = "v1";
+        currencyExchange.setEnvironment(port + " " + version + " " + host);
+        return new ResponseEntity<>(currencyExchange, HttpStatus.OK);
+    }
+}
